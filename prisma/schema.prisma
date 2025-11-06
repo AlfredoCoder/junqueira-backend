@@ -52,12 +52,12 @@ model tb_utilizadores {
 }
 
 model tb_permissao {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(45)
 }
 
 model tb_item_permissao_utilizador {
-  codigo            Int      @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo            Int      @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   codigo_Permissao  Int      @map("Codigo_Permissao")
   codigo_Utilizador Int      @map("Codigo_Utilizador") @db.UnsignedInt
   data_Permissao    DateTime @map("Data_Permissao") @db.Date
@@ -70,7 +70,7 @@ model tb_item_permissao_utilizador {
 }
 
 model tb_permissao_turma_utilizador {
-  codigo           Int @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo           Int @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   codigoTurma      Int @map("CodigoTurma")
   codigoUtilizador Int @map("CodigoUtilizador") @db.UnsignedInt
 
@@ -79,17 +79,17 @@ model tb_permissao_turma_utilizador {
 }
 
 model tb_nacionalidades {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(45)
 }
 
 model tb_estado_civil {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(45)
 }
 
 model tb_provincias {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(45)
   
   // Relacionamentos
@@ -97,7 +97,7 @@ model tb_provincias {
 }
 
 model tb_municipios {
-  codigo           Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo           Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   codigo_Provincia Int    @map("Codigo_Provincia") @db.UnsignedInt
   designacao       String @map("Designacao") @db.VarChar(45)
 
@@ -109,7 +109,7 @@ model tb_municipios {
 }
 
 model tb_comunas {
-  codigo           Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo           Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   codigo_Municipio Int    @map("Codigo_Municipio") @db.UnsignedInt
   designacao       String @map("Designacao") @db.VarChar(45)
 
@@ -120,7 +120,7 @@ model tb_comunas {
 }
 
 model tb_profissao {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(45)
   
   // Relacionamentos
@@ -128,7 +128,7 @@ model tb_profissao {
 }
 
 model tb_tipo_documento {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(45)
   
   // Relacionamentos
@@ -138,12 +138,12 @@ model tb_tipo_documento {
 }
 
 model tb_regime_iva {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(100)
 }
 
 model tb_dados_instituicao {
-  codigo         Int     @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo         Int     @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   n_Escola       String  @default("0") @map("N_Escola") @db.VarChar(45)
   nome           String  @default("nenhum") @map("Nome") @db.VarChar(450)
   director       String  @default("nenhum") @map("Director") @db.VarChar(145)
@@ -172,7 +172,7 @@ model tb_dados_instituicao {
 }
 
 model tb_parametros {
-  codigo     Int     @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int     @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String? @map("Designacao") @db.VarChar(545)
   valor      Float?  @map("Valor")
   descricao  String  @map("Descricao") @db.VarChar(105)
@@ -190,12 +190,12 @@ model tb_numeracao_documentos {
 }
 
 model tb_itens_guia {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(100)
 }
 
 model tb_ano_lectivo {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(45)
   mesInicial String @map("mesInicial") @db.VarChar(45)
   mesFinal   String @map("mesFinal") @db.VarChar(45)
@@ -216,7 +216,7 @@ model tb_cursos {
 }
 
 model tb_classes {
-  codigo     Int     @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int     @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String  @map("Designacao") @db.VarChar(45)
   status     Int     @default(1) @map("Status")
   notaMaxima Float   @default(0) @map("NotaMaxima")
@@ -242,7 +242,7 @@ model tb_disciplinas {
 }
 
 model tb_grade_curricular {
-  codigo            Int  @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo            Int  @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   codigo_disciplina Int  @map("Codigo_disciplina") @db.UnsignedInt
   codigo_Classe     Int  @map("Codigo_Classe") @db.UnsignedInt
   codigo_Curso      Int  @map("Codigo_Curso") @db.UnsignedInt
@@ -266,19 +266,19 @@ model tb_grade_curricular {
 }
 
 model tb_salas {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(45)
   tb_turmas  tb_turmas[]
 }
 
 model tb_periodos {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(45)
   tb_turmas  tb_turmas[]
 }
 
 model tb_turmas {
-  codigo            Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo            Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao        String @map("Designacao") @db.VarChar(45)
   codigo_Classe     Int  @map("Codigo_Classe") @db.UnsignedInt
   codigo_Curso      Int  @map("Codigo_Curso") @db.UnsignedInt
@@ -304,12 +304,12 @@ model tb_turmas {
 }
 
 model tb_especialidade {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(45)
 }
 
 model tb_docente {
-  codigo               Int     @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo               Int     @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   nome                 String? @default("teste") @map("Nome") @db.VarChar(100)
   status               Int?    @default(1) @map("Status")
   codigo_disciplina    Int?    @map("Codigo_disciplina")
@@ -327,7 +327,7 @@ model tb_docente {
 }
 
 model tb_disciplinas_docente {
-  codigo           Int @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo           Int @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   codigoDocente    Int @map("CodigoDocente")
   codigoCurso      Int @map("CodigoCurso")
   codigoDisciplina Int @map("CodigoDisciplina")
@@ -338,7 +338,7 @@ model tb_disciplinas_docente {
 }
 
 model tb_directores_turmas {
-  codigo           Int     @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo           Int     @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao       String? @map("Designacao") @db.VarChar(45)
   codigoAnoLectivo Int     @map("CodigoAnoLectivo")
   codigoTurma      Int     @map("CodigoTurma")
@@ -360,21 +360,21 @@ model tb_docente_turma {
 }
 
 model tb_tipo_avaliacao {
-  codigo        Int     @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo        Int     @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   descricao     String? @map("Descricao") @db.VarChar(45)
   designacao    String  @map("Designacao") @db.VarChar(45)
   tipoAvaliacao Int     @map("TipoAvaliacao")
 }
 
 model tb_tipo_nota {
-  codigo         Int     @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo         Int     @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao     String? @map("Designacao") @db.VarChar(45)
   positivaMinima Float?  @map("PositivaMinima")
   status         Int     @map("Status")
 }
 
 model tb_tipo_nota_valor {
-  codigo         Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo         Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   codigoTipoNota Int    @map("CodigoTipoNota")
   tipoValor      String @map("TipoValor") @db.VarChar(45)
   valorNumerico  Float  @map("ValorNumerico")
@@ -387,12 +387,12 @@ model tb_tipo_pauta {
 }
 
 model tb_trimestres {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(45)
 }
 
 model tb_encarregados {
-  codigo            Int      @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo            Int      @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   nome              String   @map("Nome") @db.VarChar(250)
   telefone          String   @map("Telefone") @db.VarChar(45)
   email             String?  @map("Email") @db.VarChar(45)
@@ -413,7 +413,7 @@ model tb_encarregados {
 }
 
 model tb_proveniencias {
-  codigo           Int       @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo           Int       @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao       String?   @map("Designacao") @db.VarChar(100)
   codigoStatus     Int?      @map("CodigoStatus")
   localizacao      String?   @map("Localizacao") @db.VarChar(45)
@@ -426,7 +426,7 @@ model tb_proveniencias {
 }
 
 model tb_alunos {
-  codigo                    Int       @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo                    Int       @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   nome                      String?   @map("Nome") @db.VarChar(200)
   pai                       String?   @map("Pai") @db.VarChar(200)
   mae                       String?   @map("Mae") @db.VarChar(200)
@@ -467,7 +467,7 @@ model tb_alunos {
 }
 
 model tb_matriculas {
-  codigo            Int      @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo            Int      @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   codigo_Aluno      Int      @unique @map("Codigo_Aluno") @db.UnsignedInt
   data_Matricula    DateTime @map("Data_Matricula") @db.Date
   codigo_Curso      Int  @map("Codigo_Curso") @db.UnsignedInt
@@ -486,7 +486,7 @@ model tb_matriculas {
 }
 
 model tb_confirmacoes {
-  codigo             Int       @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo             Int       @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   codigo_Matricula   Int       @map("Codigo_Matricula")
   data_Confirmacao   DateTime  @map("Data_Confirmacao") @db.Date
   codigo_Turma      Int      @map("Codigo_Turma") @db.UnsignedInt
@@ -524,7 +524,7 @@ model tb_motivos_anulacao {
 }
 
 model tb_moedas {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(45)
 }
 
@@ -568,7 +568,7 @@ model tb_tipo_multa {
 }
 
 model tb_tipo_servicos {
-  codigo            Int     @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo            Int     @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao        String  @map("Designacao") @db.VarChar(45)
   preco             Float   @map("Preco")
   descricao         String  @map("Descricao") @db.VarChar(45)
@@ -685,7 +685,7 @@ model tb_pagamentoi {
 }
 
 model tb_pagamentos {
-  codigo                Int       @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo                Int       @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   codigo_Aluno          Int       @map("Codigo_Aluno") @db.UnsignedInt
   codigo_Tipo_Servico   Int?      @map("Codigo_Tipo_Servico") @db.UnsignedInt
   data                  DateTime  @map("Data") @db.Date
@@ -765,7 +765,7 @@ model tb_tipo_declaracao {
 }
 
 model tb_efeitos_declaracao {
-  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao String @map("Designacao") @db.VarChar(45)
 }
 
@@ -810,7 +810,7 @@ model tb_professor_disciplina {
 }
 
 model tb_professor_turma {
-  codigo            Int      @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo            Int      @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   codigo_Professor  Int      @map("Codigo_Professor")
   codigo_Turma      Int      @map("Codigo_Turma") @db.UnsignedInt
   codigo_Disciplina Int      @map("Codigo_Disciplina")
@@ -846,7 +846,7 @@ model tb_periodos_avaliacao {
 }
 
 model tb_notas_alunos {
-  codigo            Int      @id @default(autoincrement()) @db.UnsignedInt @map("Codigo") @db.UnsignedInt
+  codigo            Int      @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   codigo_Aluno      Int      @map("Codigo_Aluno") @db.UnsignedInt
   codigo_Professor  Int      @map("Codigo_Professor")
   codigo_Disciplina Int      @map("Codigo_Disciplina")
