@@ -24,7 +24,7 @@ model users {
 }
 
 model tb_tipos_utilizador {
-  codigo          Int               @id @default(autoincrement()) @map("Codigo")
+  codigo          Int               @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   designacao      String            @map("Designacao") @db.VarChar(45)
   tb_utilizadores tb_utilizadores[]
 }
@@ -39,7 +39,7 @@ model tb_utilizadores {
   loginStatus            String?               @default("OFF") @map("LoginStatus") @db.VarChar(45)
   codigo_Professor       Int?                @unique(map: "Codigo_Professor") @map("Codigo_Professor") @db.UnsignedInt
   codigo_Aluno           Int?                @unique(map: "Codigo_Aluno") @map("Codigo_Aluno") @db.UnsignedInt
-  codigo_Tipo_Utilizador Int                 @map("Codigo_Tipo_Utilizador")
+  codigo_Tipo_Utilizador Int                 @map("Codigo_Tipo_Utilizador") @db.UnsignedInt
   tb_tipos_utilizador    tb_tipos_utilizador @relation(fields: [codigo_Tipo_Utilizador], references: [codigo])
   professor              tb_professores?     @relation(fields: [codigo_Professor], references: [codigo])
   aluno                  tb_alunos?          @relation(fields: [codigo_Aluno], references: [codigo])
@@ -770,7 +770,7 @@ model tb_efeitos_declaracao {
 }
 
 model tb_professores {
-  codigo            Int       @id @default(autoincrement()) @map("Codigo")
+  codigo            Int       @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
   nome              String    @map("Nome") @db.VarChar(200)
   email             String    @map("Email") @db.VarChar(100)
   telefone          String?   @map("Telefone") @db.VarChar(45)
