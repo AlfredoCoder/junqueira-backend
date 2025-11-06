@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: jomorais-backend
+    env: node
+    region: oregon # ou frankfurt para Europa
+    plan: free # starter para mais recursos
+    buildCommand: npm install && npx prisma generate
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: jomorais-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: BCRYPT_SALT_ROUNDS
+        value: 12
+      - key: JWT_EXPIRES_IN
+        value: 1h
+
+databases:
+  - name: jomorais-db
+    databaseName: jomorais_db
+    user: jomorais_user
+    region: oregon # mesmo da aplicação  
+    plan: free # PostgreSQL gratuito

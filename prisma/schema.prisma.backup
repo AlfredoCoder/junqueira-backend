@@ -1,0 +1,881 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id                BigInt    @id @default(autoincrement())
+  name              String
+  username          String    @unique @default("root")
+  email             String    @unique
+  email_verified_at DateTime?
+  password          String
+  tipo              Int       @default(1)
+  remember_token    String?   @db.VarChar(100)
+  created_at        DateTime  @default(now())
+  updated_at        DateTime?
+  foto              String    @default("img_avatar1.png")
+
+  @@map("users")
+}
+
+model tb_tipos_utilizador {
+  codigo          Int               @id @default(autoincrement()) @map("Codigo")
+  designacao      String            @map("Designacao") @db.VarChar(45)
+  tb_utilizadores tb_utilizadores[]
+}
+
+model tb_utilizadores {
+  codigo                 Int                 @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
+  nome                   String              @map("Nome") @db.VarChar(200)
+  user                   String              @unique(map: "unique_user") @map("User") @db.VarChar(45)
+  passe                  String              @map("Passe") @db.VarChar(255)
+  estadoActual           String              @map("EstadoActual") @db.VarChar(10)
+  dataCadastro           DateTime            @map("DataCadastro") @db.Date
+  loginStatus            String?               @default("OFF") @map("LoginStatus") @db.VarChar(45)
+  codigo_Professor       Int?                @unique(map: "Codigo_Professor") @map("Codigo_Professor") @db.UnsignedInt
+  codigo_Aluno           Int?                @unique(map: "Codigo_Aluno") @map("Codigo_Aluno") @db.UnsignedInt
+  codigo_Tipo_Utilizador Int                 @map("Codigo_Tipo_Utilizador")
+  tb_tipos_utilizador    tb_tipos_utilizador @relation(fields: [codigo_Tipo_Utilizador], references: [codigo])
+  professor              tb_professores?     @relation(fields: [codigo_Professor], references: [codigo])
+  aluno                  tb_alunos?          @relation(fields: [codigo_Aluno], references: [codigo])
+  tb_matriculas          tb_matriculas[]
+
+  @@index([codigo_Tipo_Utilizador], map: "FK_tb_utilizadores_1")
+  @@index([codigo_Professor], map: "tb_utilizadores_professor_idx")
+  @@index([codigo_Aluno], map: "tb_utilizadores_aluno_idx")
+}
+
+model tb_permissao {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_item_permissao_utilizador {
+  codigo            Int      @id @default(autoincrement()) @map("Codigo")
+  codigo_Permissao  Int      @map("Codigo_Permissao")
+  codigo_Utilizador Int      @map("Codigo_Utilizador") @db.UnsignedInt
+  data_Permissao    DateTime @map("Data_Permissao") @db.Date
+  status            String   @default("desactivo") @map("status") @db.VarChar(45)
+  data_Inicio       DateTime @map("Data_Inicio") @db.Date
+  data_fin          DateTime @map("Data_fin") @db.Date
+
+  @@index([codigo_Permissao], map: "FK_tb_item_permissao_utilizador_1")
+  @@index([codigo_Utilizador], map: "FK_tb_item_permissao_utilizador_2")
+}
+
+model tb_permissao_turma_utilizador {
+  codigo           Int @id @default(autoincrement()) @map("Codigo")
+  codigoTurma      Int @map("CodigoTurma")
+  codigoUtilizador Int @map("CodigoUtilizador") @db.UnsignedInt
+
+  @@index([codigoTurma], map: "FK_permissao_turma_utilizador_tuma")
+  @@index([codigoUtilizador], map: "FK_permissao_turma_utilizador_Utilizador")
+}
+
+model tb_nacionalidades {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_estado_civil {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_provincias {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_municipios {
+  codigo           Int    @id @default(autoincrement()) @map("Codigo")
+  codigo_Provincia Int    @map("Codigo_Provincia")
+  designacao       String @map("Designacao") @db.VarChar(45)
+
+  @@index([codigo_Provincia], map: "FK_Provincias")
+}
+
+model tb_comunas {
+  codigo           Int    @id @default(autoincrement()) @map("Codigo")
+  codigo_Municipio Int    @map("Codigo_Municipio")
+  designacao       String @map("Designacao") @db.VarChar(45)
+
+  @@index([codigo_Municipio], map: "tb_comunas_Codigo_Municipio_fkey")
+}
+
+model tb_profissao {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_tipo_documento {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+
+  @@map("tb_tipo_docuemnto")
+}
+
+model tb_regime_iva {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(100)
+}
+
+model tb_dados_instituicao {
+  codigo         Int     @id @default(autoincrement()) @map("Codigo")
+  n_Escola       String  @default("0") @map("N_Escola") @db.VarChar(45)
+  nome           String  @default("nenhum") @map("Nome") @db.VarChar(450)
+  director       String  @default("nenhum") @map("Director") @db.VarChar(145)
+  subDirector    String  @default("nenhum") @map("SubDirector") @db.VarChar(45)
+  telefone_Fixo  String  @default("0") @map("Telefone_Fixo") @db.VarChar(45)
+  telefone_Movel String  @default("0") @map("Telefone_Movel") @db.VarChar(45)
+  email          String  @default("nenhum") @map("Email") @db.VarChar(145)
+  site           String  @default("nenhum") @map("Site") @db.VarChar(145)
+  localidade     String  @default("0") @map("Localidade") @db.VarChar(145)
+  contribuinte   String  @default("0") @map("Contribuinte") @db.VarChar(45)
+  nif            String  @default("nenhum") @map("NIF") @db.VarChar(45)
+  contaBancaria1 String  @default("0") @map("ContaBancaria1") @db.VarChar(45)
+  contaBancaria2 String  @default("0") @map("ContaBancaria2") @db.VarChar(45)
+  contaBancaria3 String  @default("0") @map("ContaBancaria3") @db.VarChar(45)
+  contaBancaria4 String  @default("0") @map("ContaBancaria4") @db.VarChar(45)
+  contaBancaria5 String  @default("0") @map("ContaBancaria5") @db.VarChar(45)
+  contaBancaria6 String  @default("0") @map("ContaBancaria6") @db.VarChar(45)
+  regime_Iva     String? @default("0") @map("Regime_IVA") @db.VarChar(450)
+  logotipo       String  @default("0") @map("Logotipo") @db.VarChar(200)
+  provincia      String  @default("0") @map("Provincia") @db.VarChar(45)
+  municipio      String  @default("0") @map("Municipio") @db.VarChar(45)
+  nescola        String  @default("0") @map("Nescola") @db.VarChar(45)
+  taxaIva        Int?    @default(1) @map("taxaIva")
+
+  @@index([taxaIva], map: "FK_tb_dados_instituicao_tb_regime_iva")
+}
+
+model tb_parametros {
+  codigo     Int     @id @default(autoincrement()) @map("Codigo")
+  designacao String? @map("Designacao") @db.VarChar(545)
+  valor      Float?  @map("Valor")
+  descricao  String  @map("Descricao") @db.VarChar(105)
+}
+
+model statusescola {
+  codigo     Int    @id @default(autoincrement())
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_numeracao_documentos {
+  codigo     Int     @id @default(autoincrement()) @map("codigo")
+  designacao String? @map("Designacao") @db.VarChar(50)
+  next       Int?    @map("next")
+}
+
+model tb_itens_guia {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(100)
+}
+
+model tb_ano_lectivo {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+  mesInicial String @map("mesInicial") @db.VarChar(45)
+  mesFinal   String @map("mesFinal") @db.VarChar(45)
+  anoInicial String @map("anoInicial") @db.VarChar(45)
+  anoFinal   String @map("anoFinal") @db.VarChar(45)
+}
+
+model tb_cursos {
+  codigo        Int     @id @default(autoincrement()) @map("Codigo")
+  designacao    String? @map("Designacao") @db.VarChar(45)
+  codigo_Status Int?    @default(1) @map("codigo_Status")
+  tb_matriculas tb_matriculas[]
+  tb_turmas     tb_turmas[]
+}
+
+model tb_classes {
+  codigo     Int     @id @default(autoincrement()) @map("Codigo")
+  designacao String  @map("Designacao") @db.VarChar(45)
+  status     Int     @default(1) @map("Status")
+  notaMaxima Float   @default(0) @map("NotaMaxima")
+  exame      Boolean @default(false) @map("Exame")
+  tb_turmas  tb_turmas[]
+}
+
+model tb_disciplinas {
+  codigo            Int    @id @default(autoincrement()) @map("Codigo")
+  designacao        String @map("Designacao") @db.VarChar(45)
+  codigo_Curso      Int    @default(1) @map("Codigo_Curso")
+  status            Int    @default(1) @map("Status")
+  cadeiraEspecifica Int    @default(0) @map("CadeiraEspecifica")
+
+  @@index([codigo_Curso], map: "FK_tb_disciplinas_1")
+  @@index([status], map: "FK_tb_disciplinas_2")
+}
+
+model tb_grade_curricular {
+  codigo            Int  @id @default(autoincrement()) @map("Codigo")
+  codigo_disciplina Int  @map("Codigo_disciplina")
+  codigo_Classe     Int  @map("Codigo_Classe")
+  codigo_Curso      Int  @map("Codigo_Curso")
+  codigo_Turma      Int?
+  codigo_user       Int  @map("Codigo_user")
+  codigo_empresa    Int  @map("Codigo_empresa")
+  status            Int  @map("Status")
+  codigoTipoNota    Int  @map("CodigoTipoNota")
+
+  @@index([codigo_disciplina], map: "FK_tb_grade_curricular_1")
+  @@index([codigo_Classe], map: "FK_tb_grade_curricular_2")
+  @@index([codigo_Curso], map: "FK_tb_grade_curricular_3")
+  @@index([codigo_Turma], map: "FK_tb_grade_curricular_turma")
+  @@index([codigo_user], map: "FK_tb_grade_curricular_4")
+  @@index([codigo_empresa], map: "FK_tb_grade_curricular_5")
+  @@index([status], map: "FK_tb_grade_curricular_6")
+}
+
+model tb_salas {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+  tb_turmas  tb_turmas[]
+}
+
+model tb_periodos {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+  tb_turmas  tb_turmas[]
+}
+
+model tb_turmas {
+  codigo            Int    @id @default(autoincrement()) @map("Codigo")
+  designacao        String @map("Designacao") @db.VarChar(45)
+  codigo_Classe     Int    @map("Codigo_Classe")
+  codigo_Curso      Int    @map("Codigo_Curso")
+  codigo_Sala       Int    @map("Codigo_Sala")
+  codigo_Periodo    Int    @map("Codigo_Periodo")
+  status            String @default("Activo") @map("Status") @db.VarChar(45)
+  codigo_AnoLectivo Int    @default(1) @map("Codigo_AnoLectivo")
+  max_Alunos        Int    @default(30) @map("Max_Alunos")
+  tb_confirmacoes   tb_confirmacoes[]
+  tb_classes        tb_classes @relation(fields: [codigo_Classe], references: [codigo], map: "FK_tb_turmas_Classe")
+  tb_cursos         tb_cursos @relation(fields: [codigo_Curso], references: [codigo], map: "FK_tb_turmas_Curso")
+  tb_salas          tb_salas @relation(fields: [codigo_Sala], references: [codigo], map: "FK_tb_turmas_Sala")
+  tb_periodos       tb_periodos @relation(fields: [codigo_Periodo], references: [codigo], map: "FK_tb_turmas_Periodos")
+
+  @@index([codigo_Classe], map: "FK_tb_turmas_Classe")
+  @@index([codigo_Curso], map: "FK_tb_turmas_Curso")
+  @@index([codigo_Sala], map: "FK_tb_turmas_Sala")
+  @@index([codigo_Periodo], map: "FK_tb_turmas_Periodos")
+  @@index([codigo_AnoLectivo], map: "FK_tb_turmas_AnoLectivo")
+}
+
+model tb_especialidade {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_docente {
+  codigo               Int     @id @default(autoincrement()) @map("Codigo")
+  nome                 String? @default("teste") @map("Nome") @db.VarChar(100)
+  status               Int?    @default(1) @map("Status")
+  codigo_disciplina    Int?    @map("Codigo_disciplina")
+  codigo_Utilizador    Int?    @map("Codigo_Utilizador") @db.UnsignedInt
+  codigo_Especialidade Int?    @map("Codigo_Especialidade")
+  contacto             String? @map("Contacto") @db.VarChar(45)
+  email                String? @map("Email") @db.VarChar(45)
+  user_id              BigInt  @default(1) @map("user_id")
+
+  @@index([status], map: "FK_tb_docente_1")
+  @@index([codigo_disciplina], map: "FK_tb_docente_2")
+  @@index([user_id], map: "FK_tb_docente_3")
+  @@index([codigo_Especialidade], map: "tb_docente_Codigo_Especialidade_fkey")
+  @@index([codigo_Utilizador], map: "tb_docente_Codigo_Utilizador_fkey")
+}
+
+model tb_disciplinas_docente {
+  codigo           Int @id @default(autoincrement()) @map("Codigo")
+  codigoDocente    Int @map("CodigoDocente")
+  codigoCurso      Int @map("CodigoCurso")
+  codigoDisciplina Int @map("CodigoDisciplina")
+
+  @@index([codigoDocente], map: "FK_tb_disciplinas_docente_1")
+  @@index([codigoCurso], map: "FK_tb_disciplinas_docente_2")
+  @@index([codigoDisciplina], map: "FK_tb_disciplinas_docente_3")
+}
+
+model tb_directores_turmas {
+  codigo           Int     @id @default(autoincrement()) @map("Codigo")
+  designacao       String? @map("Designacao") @db.VarChar(45)
+  codigoAnoLectivo Int     @map("CodigoAnoLectivo")
+  codigoTurma      Int     @map("CodigoTurma")
+  codigoDocente    Int     @map("CodigoDocente")
+
+  @@index([codigoAnoLectivo], map: "FK_tb_directores_turmas_1")
+  @@index([codigoTurma], map: "FK_tb_directores_turmas_2")
+  @@index([codigoDocente], map: "FK_tb_directores_turmas_3")
+}
+
+model tb_docente_turma {
+  codigo_Docente Int @map("Codigo_Docente")
+  codigo_turma   Int @map("Codigo_turma")
+
+  @@id([codigo_Docente, codigo_turma], name: "PRIMARY")
+  @@index([codigo_Docente], map: "FK_docente_turma_1")
+  @@index([codigo_turma], map: "FK_docente_turma_2")
+  @@map("tb_docente_tuma")
+}
+
+model tb_tipo_avaliacao {
+  codigo        Int     @id @default(autoincrement()) @map("Codigo")
+  descricao     String? @map("Descricao") @db.VarChar(45)
+  designacao    String  @map("Designacao") @db.VarChar(45)
+  tipoAvaliacao Int     @map("TipoAvaliacao")
+}
+
+model tb_tipo_nota {
+  codigo         Int     @id @default(autoincrement()) @map("Codigo")
+  designacao     String? @map("Designacao") @db.VarChar(45)
+  positivaMinima Float?  @map("PositivaMinima")
+  status         Int     @map("Status")
+}
+
+model tb_tipo_nota_valor {
+  codigo         Int    @id @default(autoincrement()) @map("Codigo")
+  codigoTipoNota Int    @map("CodigoTipoNota")
+  tipoValor      String @map("TipoValor") @db.VarChar(45)
+  valorNumerico  Float  @map("ValorNumerico")
+  valorSprecao   String @map("ValorSprecao") @db.VarChar(45)
+}
+
+model tb_tipo_pauta {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_trimestres {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_encarregados {
+  codigo            Int      @id @default(autoincrement()) @map("Codigo")
+  nome              String   @map("Nome") @db.VarChar(250)
+  telefone          String   @map("Telefone") @db.VarChar(45)
+  email             String?  @map("Email") @db.VarChar(45)
+  codigo_Profissao  Int      @map("Codigo_Profissao")
+  local_Trabalho    String   @map("Local_Trabalho") @db.VarChar(45)
+  codigo_Utilizador Int      @map("Codigo_Utilizador") @db.UnsignedInt
+  dataCadastro      DateTime @map("DataCadastro") @db.Date
+  status            Int      @default(1) @map("Status")
+  tb_alunos         tb_alunos[]
+
+  @@index([codigo_Profissao], map: "FK_tb_encarregados_Profissao")
+  @@index([codigo_Utilizador], map: "FK_tb_encarregados_Utilizador")
+  @@index([status], map: "FK_tb_encarregados_2")
+}
+
+model tb_proveniencias {
+  codigo           Int       @id @default(autoincrement()) @map("Codigo")
+  designacao       String?   @map("Designacao") @db.VarChar(100)
+  codigoStatus     Int?      @map("CodigoStatus")
+  localizacao      String?   @map("Localizacao") @db.VarChar(45)
+  contacto         String?   @map("Contacto") @db.VarChar(45)
+  codigoUtilizador Int?      @map("CodigoUtilizador") @db.UnsignedInt
+  dataCadastro     DateTime? @map("DataCadastro") @db.Date
+
+  @@index([codigoStatus], map: "FK_tb_proveniencias_1")
+  @@index([codigoUtilizador], map: "tb_proveniencias_CodigoUtilizador_fkey")
+}
+
+model tb_alunos {
+  codigo                    Int       @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
+  nome                      String?   @map("Nome") @db.VarChar(200)
+  pai                       String?   @map("Pai") @db.VarChar(200)
+  mae                       String?   @map("Mae") @db.VarChar(200)
+  codigo_Nacionalidade      Int       @map("Codigo_Nacionalidade")
+  codigo_Estado_Civil       Int?      @map("Codigo_Estado_Civil")
+  dataNascimento            DateTime? @map("DataNascimento") @db.Date
+  email                     String?   @map("Email") @db.VarChar(45)
+  telefone                  String?   @map("Telefone") @db.VarChar(45)
+  codigo_Status             Int?      @default(1) @map("Codigo_Status")
+  codigo_Comuna             Int       @map("Codigo_Comuna")
+  codigo_Encarregado        Int       @map("Codigo_Encarregado")
+  codigo_Utilizador         Int       @map("Codigo_Utilizador") @db.UnsignedInt
+  sexo                      String?   @map("Sexo") @db.VarChar(10)
+  n_documento_identificacao String?   @map("N_documento_identificacao") @db.VarChar(45)
+  dataCadastro              DateTime? @map("DataCadastro") @db.Date
+  saldo                     Float?    @default(0) @map("Saldo")
+  desconto                  Float?    @map("Desconto")
+  url_Foto                  String?   @default("fotoDefault.png") @map("URL_Foto") @db.VarChar(345)
+  tipo_desconto             String?   @map("tipo_desconto") @db.VarChar(45)
+  escolaProveniencia        Int?      @map("EscolaProveniencia")
+  saldo_Anterior            Float?    @map("Saldo_Anterior")
+  codigoTipoDocumento       Int       @default(1) @map("CodigoTipoDocumento")
+  morada                    String    @default("...") @map("Morada") @db.VarChar(60)
+  dataEmissao               DateTime? @map("DataEmissao") @db.Date
+  motivo_Desconto           String?   @map("Motivo_Desconto") @db.VarChar(455)
+  provinciaEmissao          String    @default("LUANDA") @map("ProvinciaEmissao") @db.VarChar(45)
+  user_id                   BigInt?   @default(1) @map("user_id")
+  utilizador                tb_utilizadores?
+  tb_matriculas             tb_matriculas?
+  tb_pagamentos             tb_pagamentos[]
+  tb_encarregados           tb_encarregados @relation(fields: [codigo_Encarregado], references: [codigo], map: "tb_alunos_Codigo_Encarregado_fkey")
+
+  @@index([codigoTipoDocumento], map: "tb_alunos_CodigoTipoDocumento_fkey")
+  @@index([codigo_Encarregado], map: "tb_alunos_Codigo_Encarregado_fkey")
+}
+
+model tb_matriculas {
+  codigo            Int      @id @default(autoincrement()) @map("Codigo")
+  codigo_Aluno      Int      @unique @map("Codigo_Aluno") @db.UnsignedInt
+  data_Matricula    DateTime @map("Data_Matricula") @db.Date
+  codigo_Curso      Int      @map("Codigo_Curso")
+  codigo_Utilizador Int      @map("Codigo_Utilizador") @db.UnsignedInt
+  codigoStatus      Int      @default(1) @map("codigoStatus")
+  tb_alunos         tb_alunos @relation(fields: [codigo_Aluno], references: [codigo], map: "FK_tb_matriculas_Aluno")
+  tb_cursos         tb_cursos @relation(fields: [codigo_Curso], references: [codigo], map: "FK_tb_matriculas_Curso")
+  tb_utilizadores   tb_utilizadores @relation(fields: [codigo_Utilizador], references: [codigo], map: "tb_matriculas_Codigo_Utilizador_fkey")
+  tb_confirmacoes   tb_confirmacoes[]
+
+  @@index([codigo_Aluno], map: "FK_tb_matriculas_Aluno")
+  @@index([codigo_Curso], map: "FK_tb_matriculas_Curso")
+  @@index([codigoStatus], map: "FK_tb_matriculas_4")
+  @@index([codigo_Utilizador], map: "tb_matriculas_Codigo_Utilizador_fkey")
+  @@map("tb_matriculas")
+}
+
+model tb_confirmacoes {
+  codigo             Int       @id @default(autoincrement()) @map("Codigo")
+  codigo_Matricula   Int       @map("Codigo_Matricula")
+  data_Confirmacao   DateTime  @map("Data_Confirmacao") @db.Date
+  codigo_Turma       Int       @map("Codigo_Turma")
+  codigo_Ano_lectivo Int       @map("Codigo_Ano_lectivo")
+  codigo_Utilizador  Int       @map("Codigo_Utilizador") @db.UnsignedInt
+  mes_Comecar        DateTime? @map("Mes_Comecar") @db.Date
+  codigo_Status      Int       @default(1) @map("Codigo_Status")
+  classificacao      String?   @map("Classificacao") @db.VarChar(45)
+  tb_matriculas      tb_matriculas @relation(fields: [codigo_Matricula], references: [codigo], map: "FK_tb_confirmacoes_Matricula")
+  tb_turmas          tb_turmas @relation(fields: [codigo_Turma], references: [codigo], map: "FK_tb_confirmacoes_Turma")
+
+  @@index([codigo_Matricula], map: "FK_tb_confirmacoes_Matricula")
+  @@index([codigo_Turma], map: "FK_tb_confirmacoes_Turma")
+  @@index([codigo_Utilizador], map: "FK_tb_confirmacoes_Utilizador")
+  @@index([codigo_Ano_lectivo], map: "FK_tb_confirmacoes_Ano_Lectivo")
+}
+
+model tb_transferencias {
+  codigo            Int       @id @default(autoincrement()) @map("Codigo")
+  codigoAluno       Int       @default(1) @map("CodigoAluno") @db.UnsignedInt
+  codigoEscola      Int       @default(1) @map("CodigoEscola")
+  codigoUtilizador  Int       @default(1) @map("CodigoUtilizador") @db.UnsignedInt
+  dataTransferencia DateTime? @map("DataTransferencia") @db.Date
+  codigoMotivo      Int       @default(1) @map("CodigoMotivo")
+  obs               String?   @map("OBS") @db.VarChar(150)
+  dataActualizacao  DateTime? @map("DataActualizacao") @db.Date
+
+  @@index([codigoAluno], map: "tb_transferencias_CodigoAluno_fkey")
+}
+
+model tb_motivos_anulacao {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_moedas {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_categoria_servicos {
+  codigo     Int     @id @default(autoincrement())
+  designacao String? @default("") @db.VarChar(50)
+}
+
+model motivos_iva {
+  codigo       Int     @id @default(autoincrement())
+  codigomotivo String  @db.VarChar(45)
+  designacao   String? @db.VarChar(45)
+}
+
+model taxa_iva {
+  codigo    Int    @id @default(autoincrement())
+  taxa      Float  @default(0)
+  designcao String @db.VarChar(45)
+}
+
+model tb_motivo_isencao {
+  codigo         Int    @id @default(autoincrement()) @map("Codigo")
+  codigo_Isencao String @map("Codigo_Isencao") @db.VarChar(5)
+  designacao     String @map("Designacao") @db.VarChar(300)
+  status         String @default("Activo") @map("Status") @db.VarChar(30)
+}
+
+model tb_tipo_taxa_iva {
+  codigo         Int     @id @default(autoincrement()) @map("Codigo")
+  taxa           Int     @default(0) @map("Taxa")
+  designacao     String? @default("") @map("Designacao") @db.VarChar(45)
+  codigo_Isencao Int?    @default(0) @map("Codigo_Isencao")
+  status         String  @default("Activo") @map("Status") @db.VarChar(45)
+
+  @@index([codigo_Isencao], map: "FK_tb_tipo_taxa_iva_1")
+}
+
+model tb_tipo_multa {
+  codigo    Int    @id @default(autoincrement()) @map("Codigo")
+  descrisao String @map("Descrisao") @db.VarChar(45)
+}
+
+model tb_tipo_servicos {
+  codigo            Int     @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
+  designacao        String  @map("Designacao") @db.VarChar(45)
+  preco             Float   @map("Preco")
+  descricao         String  @map("Descricao") @db.VarChar(45)
+  codigo_Utilizador Int     @map("Codigo_Utilizador") @db.UnsignedInt
+  codigo_Moeda      Int     @map("Codigo_Moeda")
+  tipoServico       String  @map("TipoServico") @db.VarChar(15)
+  status            String  @default("Activo") @map("Status") @db.VarChar(45)
+  aplicarMulta      Boolean @default(false) @map("AplicarMulta")
+  aplicarDesconto   Boolean @default(false) @map("AplicarDesconto")
+  codigo_Ano        Int     @default(1) @map("Codigo_Ano")
+  codigoAnoLectivo  Int?    @map("CodigoAnoLectivo")
+  valorMulta        Float   @default(0) @map("ValorMulta")
+  iva               Int?    @map("iva")
+  codigoRasao       Int?    @map("codigoRasao")
+  categoria         Int?    @map("Categoria")
+  codigo_multa      Int?    @map("codigo_multa")
+  codigo_Classe     Int?    @map("Codigo_Classe")
+  codigo_Curso      Int?    @map("Codigo_Curso")
+  tb_pagamentos     tb_pagamentos[]
+
+  @@index([codigo_Moeda], map: "FK_tb_tipo_moedas")
+  @@index([codigoRasao], map: "FK_tb_tipo_servicos_motivos_iva")
+  @@index([iva], map: "FK_tb_tipo_servicos_taxa_iva")
+  @@index([categoria], map: "FK_tb_tipo_servicos_tb_categoria_servicos")
+  @@index([codigo_multa], map: "tb_tipo_servicos_codigo_multa_fkey")
+  @@index([codigo_Classe], map: "FK_tb_tipo_servicos_tb_classes")
+  @@index([codigo_Curso], map: "FK_tb_tipo_servicos_tb_cursos")
+}
+
+model tb_servicos_turma {
+  codigo        Int    @id @default(autoincrement()) @map("Codigo")
+  codigoTurma   Int    @map("CodigoTurma")
+  anoLectivo    String @map("AnoLectivo") @db.VarChar(45)
+  codigoClasse  Int    @map("CodigoClasse")
+  codigoServico Int    @map("CodigoServico") @db.UnsignedInt
+
+  @@index([codigoClasse], map: "FK_tb_servicos_turma_1")
+  @@index([codigoTurma], map: "FK_tb_servicos_turma_2")
+  @@index([codigoServico], map: "FK_tb_servicos_turma_3")
+}
+
+model tb_servico_aluno {
+  codigo         Int @id @default(autoincrement()) @map("Codigo")
+  codigo_Servico Int @map("Codigo_Servico") @db.UnsignedInt
+  codigo_Aluno   Int @map("Codigo_Aluno") @db.UnsignedInt
+  status         Int @map("status")
+  codigo_Turma   Int @default(1) @map("Codigo_Turma")
+
+  @@index([codigo_Servico], map: "FK_tb_servico_classe_1")
+  @@index([codigo_Aluno], map: "FK_tb_servico_classe_2")
+  @@index([status], map: "FK_tb_servico_classe_3")
+  @@index([codigo_Turma], map: "FK_tb_servico_aluno_4")
+}
+
+model tb_propina_classe {
+  codigo            Int      @id @default(autoincrement()) @map("Codigo")
+  codigoClasse      Int      @map("CodigoClasse")
+  codigoTipoServico Int      @map("CodigoTipoServico") @db.UnsignedInt
+  codigoUtilizador  Int      @map("CodigoUtilizador") @db.UnsignedInt
+  dataRegisto       DateTime @map("DataRegisto") @db.Date
+  anoLectivo        String   @default("2017") @map("AnoLectivo") @db.VarChar(45)
+
+  @@index([codigoClasse], map: "FK_tb_propina_classe_1")
+  @@index([codigoTipoServico], map: "FK_tb_propina_classe_2")
+  @@index([codigoUtilizador], map: "FK_tb_propina_classe_3")
+}
+
+model tb_limite_pagamento_propina {
+  codigo       Int    @id @default(autoincrement()) @map("Codigo")
+  codigoClasse Int    @map("CodigoClasse")
+  mesLimite    String @map("MesLimite") @db.VarChar(45)
+  mesInicial   String @map("mesInicial") @db.VarChar(45)
+
+  @@index([codigoClasse], map: "FK_tb_limite_pagamento_propina_1")
+}
+
+model tb_meses_classe {
+  codigo       Int    @id @default(autoincrement()) @map("Codigo")
+  mes          String @map("Mes") @db.VarChar(45)
+  codigoClasse Int    @map("CodigoClasse")
+
+  @@index([codigoClasse], map: "FK_tb_meses_classe_1")
+}
+
+model tb_forma_pagamento {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_pagamentoi {
+  codigo           Int      @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
+  data             DateTime @map("Data") @db.Date
+  codigo_Aluno     Int      @map("Codigo_Aluno") @db.UnsignedInt
+  status           Int      @map("Status")
+  total            Float?   @map("Total")
+  valorEntregue    Float    @map("ValorEntregue")
+  dataBanco        DateTime @map("DataBanco") @db.Date
+  totalDesconto    Float    @map("TotalDesconto")
+  obs              String?  @map("Obs") @db.VarChar(200)
+  borderoux        String?  @map("Borderoux") @db.VarChar(200)
+  saldoAnterior    Float    @default(0) @map("SaldoAnterior")
+  descontoSaldo    Float    @default(0) @map("DescontoSaldo")
+  saldo            Float    @default(0) @map("Saldo")
+  codigoPagamento  Int      @default(0) @map("CodigoPagamento") @db.UnsignedInt
+  saldoOperacao    Float    @default(0) @map("SaldoOperacao")
+  codigoUtilizador Int?     @map("CodigoUtilizador") @db.UnsignedInt
+  hash             String?  @map("hash") @db.VarChar(1000)
+  tipoDocumento    String?  @map("TipoDocumento") @db.VarChar(50)
+  totalIva         Float?   @map("TotalIva")
+  nifCliente       String?  @map("nifCliente") @db.VarChar(50)
+  troco            Float?   @map("troco")
+
+  @@index([status], map: "FK_tb_pagamentoI_1")
+}
+
+model tb_pagamentos {
+  codigo                Int       @id @default(autoincrement()) @map("Codigo") @db.UnsignedInt
+  codigo_Aluno          Int       @map("Codigo_Aluno") @db.UnsignedInt
+  codigo_Tipo_Servico   Int?      @map("Codigo_Tipo_Servico") @db.UnsignedInt
+  data                  DateTime  @map("Data") @db.Date
+  n_Bordoro             String    @map("N_Bordoro") @db.VarChar(200)
+  multa                 Float     @map("Multa") @db.Float
+  mes                   String?   @map("Mes") @db.VarChar(45)
+  codigo_Utilizador     Int       @map("Codigo_Utilizador") @db.UnsignedInt
+  observacao            String    @map("Observacao") @db.VarChar(100)
+  ano                   Int?      @default(1975) @map("Ano") @db.UnsignedInt
+  contaMovimentada      String    @map("ContaMovimentada") @db.VarChar(45)
+  quantidade            Int?      @map("Quantidade") @db.UnsignedInt
+  desconto              Float?    @map("Desconto") @db.Float
+  totalgeral            Float?    @map("Totalgeral") @db.Float
+  dataBanco             DateTime? @map("DataBanco") @db.Date
+  codigo_Estatus        Int       @default(1) @map("Codigo_Estatus") @db.UnsignedInt
+  codigo_Empresa        Int?      @default(1) @map("Codigo_Empresa") @db.UnsignedInt
+  codigo_FormaPagamento Int?      @default(1) @map("Codigo_FormaPagamento") @db.UnsignedInt
+  saldo_Anterior        Float?    @default(0) @map("Saldo_Anterior") @db.Float
+  codigoPagamento       Int       @default(1) @map("CodigoPagamento") @db.UnsignedInt
+  descontoSaldo         Float     @default(1) @map("DescontoSaldo") @db.Float
+  tipoDocumento         String    @map("TipoDocumento") @db.VarChar(45)
+  next                  String    @map("Next") @db.VarChar(45)
+  codoc                 Int       @default(0) @map("codoc") @db.UnsignedInt
+  fatura                String    @map("fatura") @db.VarChar(45)
+  taxa_iva              Float?    @map("taxa_iva")
+  hash                  String    @map("hash") @db.VarChar(555)
+  preco                 Float     @default(0) @map("preco")
+  indice_mes            Int?      @map("indice_mes")
+  indice_ano            Int?      @map("indice_ano")
+  aluno                 tb_alunos @relation(fields: [codigo_Aluno], references: [codigo], map: "FK_tb_pagamentos_Aluno")
+  tb_tipo_servicos      tb_tipo_servicos? @relation(fields: [codigo_Tipo_Servico], references: [codigo], map: "FK_tb_pagamentos_Tipo_Servicos")
+
+  @@index([codigo_Utilizador], map: "FK_tb_pagamentos_Utilizadore")
+  @@index([codigo_Tipo_Servico], map: "FK_tb_pagamentos_Tipo_Servicos")
+  @@index([codigo_Aluno], map: "FK_tb_pagamentos_Aluno")
+  @@index([codigoPagamento], map: "FK_tb_pagamentos_CodigoPagamento")
+  @@index([codigo_FormaPagamento], map: "FK_tb_pagamentos_Codigo_FormaPagamento")
+  @@map("tb_pagamentos")
+}
+
+model tb_nota_credito {
+  codigo           Int     @id @default(autoincrement()) @map("codigo")
+  designacao       String  @map("Designacao") @db.VarChar(200)
+  fatura           String  @map("fatura") @db.VarChar(100)
+  descricao        String  @map("Descricao") @db.VarChar(500)
+  valor            String  @map("valor") @db.VarChar(45)
+  codigo_aluno     Int     @map("codigo_aluno") @db.UnsignedInt
+  documento        String  @map("Documento") @db.VarChar(100)
+  next             String  @map("next") @db.VarChar(45)
+  dataOperacao     String? @default("00-00-0000") @map("DataOperacao") @db.VarChar(45)
+  hash             String? @map("hash") @db.VarChar(555)
+  codigoPagamentoi Int?    @map("CodigoPagamentoi")
+
+  @@index([codigo_aluno], map: "FK_tb_nota_credito_1")
+  @@map("tb_nota_credito")
+}
+
+model tb_tipo_status {
+  codigo     Int    @id @default(autoincrement()) @map("codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_status {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+  tipoStatus Int?   @map("tipoStatus")
+
+  @@index([tipoStatus], map: "FK_tb_status_1")
+}
+
+model tb_tipo_declaracao {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_efeitos_declaracao {
+  codigo     Int    @id @default(autoincrement()) @map("Codigo")
+  designacao String @map("Designacao") @db.VarChar(45)
+}
+
+model tb_professores {
+  codigo            Int       @id @default(autoincrement()) @map("Codigo")
+  nome              String    @map("Nome") @db.VarChar(200)
+  email             String    @map("Email") @db.VarChar(100)
+  telefone          String?   @map("Telefone") @db.VarChar(45)
+  formacao          String    @map("Formacao") @db.VarChar(200)
+  nivelAcademico    String    @map("NivelAcademico") @db.VarChar(100)
+  especialidade     String?   @map("Especialidade") @db.VarChar(100)
+  numeroFuncionario String?   @map("NumeroFuncionario") @db.VarChar(50)
+  dataAdmissao      DateTime? @map("DataAdmissao") @db.Date
+  status            String    @default("Activo") @map("Status") @db.VarChar(20)
+  Codigo_Utilizador Int?      @db.UnsignedInt
+  dataCadastro      DateTime  @default(now()) @map("DataCadastro")
+  dataActualizacao  DateTime  @updatedAt @map("DataActualizacao")
+  utilizador        tb_utilizadores?
+  tb_professor_disciplina tb_professor_disciplina[]
+  tb_professor_turma      tb_professor_turma[]
+  tb_notas_alunos         tb_notas_alunos[]
+
+  @@index([status], map: "FK_tb_professores_status")
+}
+
+model tb_professor_disciplina {
+  codigo            Int      @id @default(autoincrement()) @map("Codigo")
+  codigo_Professor  Int      @map("Codigo_Professor")
+  codigo_Disciplina Int      @map("Codigo_Disciplina")
+  codigo_Curso      Int      @map("Codigo_Curso")
+  anoLectivo        String   @map("AnoLectivo") @db.VarChar(45)
+  status            String   @default("Activo") @map("Status") @db.VarChar(20)
+  dataCadastro      DateTime @default(now()) @map("DataCadastro")
+  tb_professores    tb_professores @relation(fields: [codigo_Professor], references: [codigo], map: "FK_tb_professor_disciplina_professor")
+
+  @@unique([codigo_Professor, codigo_Disciplina, codigo_Curso, anoLectivo], name: "UK_professor_disciplina_curso_ano")
+  @@index([codigo_Professor], map: "FK_tb_professor_disciplina_professor")
+  @@index([codigo_Disciplina], map: "FK_tb_professor_disciplina_disciplina")
+  @@index([codigo_Curso], map: "FK_tb_professor_disciplina_curso")
+}
+
+model tb_professor_turma {
+  codigo            Int      @id @default(autoincrement()) @map("Codigo")
+  codigo_Professor  Int      @map("Codigo_Professor")
+  codigo_Turma      Int      @map("Codigo_Turma")
+  codigo_Disciplina Int      @map("Codigo_Disciplina")
+  anoLectivo        String   @map("AnoLectivo") @db.VarChar(45)
+  status            String   @default("Activo") @map("Status") @db.VarChar(20)
+  dataCadastro      DateTime @default(now()) @map("DataCadastro")
+  tb_professores    tb_professores @relation(fields: [codigo_Professor], references: [codigo], map: "FK_tb_professor_turma_professor")
+
+  @@unique([codigo_Professor, codigo_Turma, codigo_Disciplina, anoLectivo], name: "UK_professor_turma_disciplina_ano")
+  @@index([codigo_Professor], map: "FK_tb_professor_turma_professor")
+  @@index([codigo_Turma], map: "FK_tb_professor_turma_turma")
+  @@index([codigo_Disciplina], map: "FK_tb_professor_turma_disciplina")
+}
+
+model tb_periodos_avaliacao {
+  codigo        Int      @id @default(autoincrement()) @map("Codigo")
+  designacao    String   @map("Designacao") @db.VarChar(100)
+  tipoAvaliacao String   @map("TipoAvaliacao") @db.VarChar(10)
+  trimestre     Int      @map("Trimestre")
+  dataInicio    DateTime @map("DataInicio") @db.Date
+  dataFim       DateTime @map("DataFim") @db.Date
+  anoLectivo    String   @map("AnoLectivo") @db.VarChar(45)
+  status        String   @default("Activo") @map("Status") @db.VarChar(20)
+  observacoes   String?  @map("Observacoes") @db.Text
+  dataCadastro  DateTime @default(now()) @map("DataCadastro")
+
+  @@index([trimestre], map: "FK_tb_periodos_avaliacao_trimestre")
+  @@index([anoLectivo], map: "FK_tb_periodos_avaliacao_ano")
+  @@index([tipoAvaliacao], map: "FK_tb_periodos_avaliacao_tipo")
+}
+
+model tb_notas_alunos {
+  codigo            Int      @id @default(autoincrement()) @map("Codigo")
+  codigo_Aluno      Int      @map("Codigo_Aluno") @db.UnsignedInt
+  codigo_Professor  Int      @map("Codigo_Professor")
+  codigo_Disciplina Int      @map("Codigo_Disciplina")
+  codigo_Turma      Int      @map("Codigo_Turma")
+  codigo_Periodo    Int      @map("Codigo_Periodo")
+  trimestre         Int      @map("Trimestre")
+  anoLectivo        String   @map("AnoLectivo") @db.VarChar(45)
+  notaMAC           Float?   @map("NotaMAC")
+  notaPP            Float?   @map("NotaPP")
+  notaPT            Float?   @map("NotaPT")
+  mediaTrimestre    Float?   @map("MediaTrimestre")
+  classificacao     String?  @map("Classificacao") @db.VarChar(20)
+  observacoes       String?  @map("Observacoes") @db.Text
+  dataLancamento    DateTime @default(now()) @map("DataLancamento")
+  dataActualizacao  DateTime @updatedAt @map("DataActualizacao")
+  lancadoPor        Int      @map("LancadoPor") @db.UnsignedInt
+  status            String   @default("Activo") @map("Status") @db.VarChar(20)
+  tb_professores    tb_professores @relation(fields: [codigo_Professor], references: [codigo], map: "FK_tb_notas_alunos_professor")
+
+  @@index([codigo_Aluno], map: "FK_tb_notas_alunos_aluno")
+  @@index([codigo_Professor], map: "FK_tb_notas_alunos_professor")
+  @@index([codigo_Disciplina], map: "FK_tb_notas_alunos_disciplina")
+  @@index([codigo_Turma], map: "FK_tb_notas_alunos_turma")
+  @@index([codigo_Periodo], map: "FK_tb_notas_alunos_periodo")
+  @@index([lancadoPor], map: "tb_notas_alunos_LancadoPor_fkey")
+}
+
+model tb_historico_notas {
+  codigo          Int      @id @default(autoincrement()) @map("Codigo")
+  codigo_Nota     Int      @map("Codigo_Nota")
+  CampoAlterado   String   @db.VarChar(50)
+  ValorAnterior   Float?
+  ValorNovo       Float?
+  motivoAlteracao String?  @map("MotivoAlteracao") @db.Text
+  alteradoPor     Int      @map("AlteradoPor") @db.UnsignedInt
+  dataAlteracao   DateTime @default(now()) @map("DataAlteracao")
+
+  @@index([codigo_Nota], map: "FK_tb_historico_notas_nota")
+  @@index([alteradoPor], map: "FK_tb_historico_notas_usuario")
+}
+
+model exp {
+  idExp      Int    @id @default(autoincrement()) @db.UnsignedInt
+  designacao String @db.VarChar(45)
+}
+
+model loginadmin {
+  codigo       Int    @id @default(autoincrement()) @db.UnsignedInt
+  usuario      String @db.VarChar(45)
+  senha        String @db.VarChar(45)
+  nomeCompleto String @db.VarChar(45)
+  resetSenha   String @db.VarChar(45)
+}
+
+model loginpedagogico {
+  codigo       Int    @id @default(autoincrement()) @db.UnsignedInt
+  usuario      String @db.VarChar(45)
+  senha        String @db.VarChar(45)
+  nomeCompleto String @db.VarChar(45)
+  resetSenha   String @db.VarChar(45)
+  TipoUsuario  String @db.VarChar(45)
+}
+
+model logssenhaalter {
+  codigo     Int    @id @default(autoincrement()) @db.UnsignedInt
+  designacao String @db.VarChar(45)
+  senha      String @db.VarChar(45)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model moveimento_caixa_view {
+  Codigo                   Int?      @db.UnsignedInt
+  Data                     DateTime? @db.DateTime(0)
+  Codigo_FormaPagamento    Int?      @db.UnsignedInt
+  Codigo_Aluno             Int?      @db.UnsignedInt
+  ValorEntregue            Float?    @db.Float
+  Codigo_Utilizador        Int?      @db.UnsignedInt
+  NomeUtilizador           String?   @db.VarChar(45)
+  FormaPagamentoDesignacao String?   @db.VarChar(45)
+
+  @@ignore
+}

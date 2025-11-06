@@ -1,0 +1,157 @@
+// Schema simplificado apenas para as tabelas do sistema de notas
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ===============================================================
+// SISTEMA DE AVALIAÇÃO E NOTAS - TABELAS NOVAS
+// ===============================================================
+
+// Tabela de professores
+model tb_professores {
+  codigo            Int       @id @default(autoincrement()) @map("Codigo")
+  nome              String    @db.VarChar(200) @map("Nome")
+  email             String    @db.VarChar(100) @map("Email")
+  telefone          String?   @db.VarChar(45) @map("Telefone")
+  formacao          String    @db.VarChar(200) @map("Formacao") // Ex: "Licenciatura em Matemática"
+  nivelAcademico    String    @db.VarChar(100) @map("NivelAcademico") // Ex: "Licenciado", "Mestre", "Doutor"
+  especialidade     String?   @db.VarChar(100) @map("Especialidade")
+  numeroFuncionario String?   @db.VarChar(50) @map("NumeroFuncionario")
+  dataAdmissao      DateTime? @db.Date @map("DataAdmissao")
+  status            String    @db.VarChar(20) @default("Activo") @map("Status")
+  codigo_Utilizador Int?      @map("Codigo_Utilizador")
+  dataCadastro      DateTime  @default(now()) @map("DataCadastro")
+  dataActualizacao  DateTime  @updatedAt @map("DataActualizacao")
+
+  // Relacionamentos
+  tb_professor_disciplina tb_professor_disciplina[]
+  tb_professor_turma      tb_professor_turma[]
+  tb_notas_alunos         tb_notas_alunos[]
+
+  @@index([codigo_Utilizador], name: "FK_tb_professores_utilizador")
+  @@index([status], name: "FK_tb_professores_status")
+}
+
+// Relacionamento Professor-Disciplina
+model tb_professor_disciplina {
+  codigo            Int      @id @default(autoincrement()) @map("Codigo")
+  codigo_Professor  Int      @map("Codigo_Professor")
+  codigo_Disciplina Int      @map("Codigo_Disciplina")
+  codigo_Curso      Int      @map("Codigo_Curso")
+  anoLectivo        String   @db.VarChar(45) @map("AnoLectivo")
+  status            String   @db.VarChar(20) @default("Activo") @map("Status")
+  dataCadastro      DateTime @default(now()) @map("DataCadastro")
+
+  // Relacionamentos
+  tb_professores tb_professores @relation(fields: [codigo_Professor], references: [codigo])
+
+  @@index([codigo_Professor], name: "FK_tb_professor_disciplina_professor")
+  @@index([codigo_Disciplina], name: "FK_tb_professor_disciplina_disciplina")
+  @@index([codigo_Curso], name: "FK_tb_professor_disciplina_curso")
+  @@unique([codigo_Professor, codigo_Disciplina, codigo_Curso, anoLectivo], name: "UK_professor_disciplina_curso_ano")
+}
+
+// Relacionamento Professor-Turma
+model tb_professor_turma {
+  codigo           Int      @id @default(autoincrement()) @map("Codigo")
+  codigo_Professor Int      @map("Codigo_Professor")
+  codigo_Turma     Int      @map("Codigo_Turma")
+  codigo_Disciplina Int     @map("Codigo_Disciplina")
+  anoLectivo       String   @db.VarChar(45) @map("AnoLectivo")
+  status           String   @db.VarChar(20) @default("Activo") @map("Status")
+  dataCadastro     DateTime @default(now()) @map("DataCadastro")
+
+  // Relacionamentos
+  tb_professores tb_professores @relation(fields: [codigo_Professor], references: [codigo])
+
+  @@index([codigo_Professor], name: "FK_tb_professor_turma_professor")
+  @@index([codigo_Turma], name: "FK_tb_professor_turma_turma")
+  @@index([codigo_Disciplina], name: "FK_tb_professor_turma_disciplina")
+  @@unique([codigo_Professor, codigo_Turma, codigo_Disciplina, anoLectivo], name: "UK_professor_turma_disciplina_ano")
+}
+
+// Períodos de avaliação
+model tb_periodos_avaliacao {
+  codigo        Int      @id @default(autoincrement()) @map("Codigo")
+  designacao    String   @db.VarChar(100) @map("Designacao") // "Período MAC", "Período PP", "Período PT"
+  tipoAvaliacao String   @db.VarChar(10) @map("TipoAvaliacao") // "MAC", "PP", "PT"
+  trimestre     Int      @map("Trimestre") // 1, 2, 3
+  dataInicio    DateTime @db.Date @map("DataInicio")
+  dataFim       DateTime @db.Date @map("DataFim")
+  anoLectivo    String   @db.VarChar(45) @map("AnoLectivo")
+  status        String   @db.VarChar(20) @default("Activo") @map("Status")
+  observacoes   String?  @db.Text @map("Observacoes")
+  dataCadastro  DateTime @default(now()) @map("DataCadastro")
+
+  // Relacionamentos
+  tb_notas_alunos tb_notas_alunos[]
+
+  @@index([trimestre], name: "FK_tb_periodos_avaliacao_trimestre")
+  @@index([anoLectivo], name: "FK_tb_periodos_avaliacao_ano")
+  @@index([tipoAvaliacao], name: "FK_tb_periodos_avaliacao_tipo")
+}
+
+// Tabela principal de notas dos alunos
+model tb_notas_alunos {
+  codigo               Int      @id @default(autoincrement()) @map("Codigo")
+  codigo_Aluno         Int      @map("Codigo_Aluno")
+  codigo_Professor     Int      @map("Codigo_Professor")
+  codigo_Disciplina    Int      @map("Codigo_Disciplina")
+  codigo_Turma         Int      @map("Codigo_Turma")
+  codigo_Periodo       Int      @map("Codigo_Periodo")
+  trimestre            Int      @map("Trimestre") // 1, 2, 3
+  anoLectivo           String   @db.VarChar(45) @map("AnoLectivo")
+  
+  // Notas específicas
+  notaMAC              Float?   @map("NotaMAC") // Média de Avaliação Contínua
+  notaPP               Float?   @map("NotaPP")  // Prova do Professor
+  notaPT               Float?   @map("NotaPT")  // Prova do Trimestre
+  mediaTrimestre       Float?   @map("MediaTrimestre") // Calculada automaticamente
+  
+  // Classificação
+  classificacao        String?  @db.VarChar(20) @map("Classificacao") // "Aprovado", "Reprovado", "Pendente"
+  observacoes          String?  @db.Text @map("Observacoes")
+  
+  // Controle
+  dataLancamento       DateTime @default(now()) @map("DataLancamento")
+  dataActualizacao     DateTime @updatedAt @map("DataActualizacao")
+  lancadoPor           Int      @map("LancadoPor") // Código do usuário que lançou
+  status               String   @db.VarChar(20) @default("Activo") @map("Status")
+
+  // Relacionamentos
+  tb_professores        tb_professores @relation(fields: [codigo_Professor], references: [codigo])
+  tb_periodos_avaliacao tb_periodos_avaliacao @relation(fields: [codigo_Periodo], references: [codigo])
+  tb_historico_notas    tb_historico_notas[]
+
+  @@index([codigo_Aluno], name: "FK_tb_notas_alunos_aluno")
+  @@index([codigo_Professor], name: "FK_tb_notas_alunos_professor")
+  @@index([codigo_Disciplina], name: "FK_tb_notas_alunos_disciplina")
+  @@index([codigo_Turma], name: "FK_tb_notas_alunos_turma")
+  @@index([codigo_Periodo], name: "FK_tb_notas_alunos_periodo")
+  @@index([trimestre], name: "FK_tb_notas_alunos_trimestre")
+  @@index([anoLectivo], name: "FK_tb_notas_alunos_ano")
+  @@unique([codigo_Aluno, codigo_Disciplina, codigo_Turma, trimestre, anoLectivo], name: "UK_nota_aluno_disciplina_turma_trimestre")
+}
+
+// Histórico de alterações de notas (auditoria)
+model tb_historico_notas {
+  codigo            Int      @id @default(autoincrement()) @map("Codigo")
+  codigo_Nota       Int      @map("Codigo_Nota")
+  campoAlterado     String   @db.VarChar(50) @map("CampoAlterado") // "notaMAC", "notaPP", "notaPT"
+  valorAnterior     Float?   @map("ValorAnterior")
+  valorNovo         Float?   @map("ValorNovo")
+  motivoAlteracao   String?  @db.Text @map("MotivoAlteracao")
+  alteradoPor       Int      @map("AlteradoPor")
+  dataAlteracao     DateTime @default(now()) @map("DataAlteracao")
+
+  // Relacionamentos
+  tb_notas_alunos tb_notas_alunos @relation(fields: [codigo_Nota], references: [codigo])
+
+  @@index([codigo_Nota], name: "FK_tb_historico_notas_nota")
+  @@index([alteradoPor], name: "FK_tb_historico_notas_usuario")
+}
