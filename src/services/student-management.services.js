@@ -2,6 +2,7 @@
 import prisma from '../config/database.js';
 import { AppError } from '../utils/validation.utils.js';
 import { getPagination } from '../utils/pagination.utils.js';
+import bcrypt from 'bcrypt';
 
 export class StudentManagementService {
   // ===============================
@@ -549,6 +550,9 @@ export class StudentManagementService {
         throw new AppError('Tipo de usuário Aluno não encontrado', 404);
       }
 
+      // 3. Gerar hash da senha padrão
+      const senhaHash = await bcrypt.hash('123456', 10);
+
       // 3. Executar transação
       return await prisma.$transaction(async (tx) => {
         // Criar encarregado
@@ -582,7 +586,7 @@ export class StudentManagementService {
           data: {
             nome: aluno.nome,
             user: finalUsername,
-            passe: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+            passe: senhaHash,
             codigo_Tipo_Utilizador: tipoAluno.codigo,
             estadoActual: 'ACTIVO',
             dataCadastro: new Date(),

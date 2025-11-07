@@ -2,6 +2,7 @@ import { getPagination, getPagingData } from "../utils/pagination.utils.js";
 import { AppError } from "../utils/validation.utils.js";
 import { convertBigIntToString } from "../utils/bigint.utils.js";
 import prisma from "../config/database.js";
+import bcrypt from 'bcrypt';
 
 export class UsersServices {
   static async getAllLegacyUsers(req, res) {
@@ -112,14 +113,17 @@ export class UsersServices {
         throw new AppError("Tipo de usuário não encontrado", 400);
       }
 
+      // Hash da senha usando bcrypt (compatível com sistema integrado)
+      const hashedPassword = await bcrypt.hash(userData.passe, 10);
+
       // Criar o usuário
       const user = await prisma.tb_utilizadores.create({
         data: {
           nome: userData.nome,
           user: userData.user,
-          passe: userData.passe, // Em produção, deve ser hasheada
+          passe: hashedPassword,
           codigo_Tipo_Utilizador: userData.codigo_Tipo_Utilizador,
-          estadoActual: userData.estadoActual || 'ATIVO',
+          estadoActual: userData.estadoActual || 'ACTIVO',
           dataCadastro: new Date(),
           loginStatus: 'OFF'
         },

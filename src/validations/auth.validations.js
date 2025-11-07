@@ -65,7 +65,7 @@ export const legacyRegisterSchema = z.object({
     .trim()
     .max(10, "Estado deve ter no máximo 10 caracteres")
     .optional()
-    .default("Activo")
+    .default("ACTIVO")
 });
 
 // ===== Login no Sistema Legado =====

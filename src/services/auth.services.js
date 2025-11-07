@@ -141,7 +141,7 @@ export class AuthService {
     username = username?.trim()?.toLowerCase() || '';
     passe = passe?.trim() || '';
     codigo_Tipo_Utilizador = codigo_Tipo_Utilizador || 2;
-    estadoActual = estadoActual?.trim() || "Activo";
+    estadoActual = estadoActual?.trim() || "ACTIVO";
 
     // Validações básicas
     if (!nome) throw new AppError('Nome é obrigatório', 400);
