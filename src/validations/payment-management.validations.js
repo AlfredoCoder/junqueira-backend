@@ -133,7 +133,7 @@ export const pagamentoCreateSchemaFull = z.object({
 export const pagamentoCreateSchema = z.object({
   codigo_Aluno: positiveInt,
   codigo_Tipo_Servico: positiveInt,
-  mes: z.string().min(1, "Mês é obrigatório").max(45, "Mês deve ter no máximo 45 caracteres"),
+  mes: z.string().max(45, "Mês deve ter no máximo 45 caracteres").optional(), // Opcional para serviços que não requerem mês
   ano: z.number().int().min(1900).max(2100),
   preco: positiveNumber,
   observacao: z.string().max(100, "Observação deve ter no máximo 100 caracteres").optional().default(""),

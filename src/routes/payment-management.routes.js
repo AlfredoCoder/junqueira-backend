@@ -1086,7 +1086,51 @@ router.get('/tipos-servicos-compatibles/:alunoId', async (req, res) => {
     const { alunoId } = req.params;
     const { categoria } = req.query;
     
-    console.log(`🔍 Buscando confirmação mais recente para aluno ${alunoId}`);
+    if (!categoria) {
+      return res.status(400).json({
+        success: false,
+        message: "Categoria é obrigatória"
+      });
+    }
+
+    console.log(`🔍 Buscando serviços para categoria ${categoria}`);
+
+    // Primeiro, verificar se existem serviços gerais nesta categoria
+    const servicosGerais = await prisma.tb_tipo_servicos.findMany({
+      where: {
+        status: "Activo",
+        categoria: parseInt(categoria),
+        codigo_Classe: null,
+        codigo_Curso: null
+      },
+      orderBy: { designacao: 'asc' }
+    });
+
+    console.log(`📦 Encontrados ${servicosGerais.length} serviços gerais na categoria ${categoria}`);
+
+    // Se há serviços gerais, retornar apenas eles (não precisa buscar dados do aluno)
+    if (servicosGerais.length > 0) {
+      console.log('✅ Retornando serviços gerais (sem restrições de classe/curso)');
+      
+      return res.json({
+        success: true,
+        message: `Encontrados ${servicosGerais.length} tipos de serviços compatíveis`,
+        data: {
+          tiposServicos: servicosGerais,
+          alunoInfo: {
+            nome: 'Serviços gerais - não requer dados acadêmicos',
+            tipo: 'geral'
+          },
+          filtros: {
+            categoria: parseInt(categoria),
+            tipo: 'geral'
+          }
+        }
+      });
+    }
+
+    // Se não há serviços gerais, buscar serviços específicos por classe/curso
+    console.log(`🎓 Não há serviços gerais. Buscando serviços específicos para aluno ${alunoId}`);
 
     // Buscar dados acadêmicos do aluno através da confirmação mais recente
     const confirmacao = await prisma.tb_confirmacoes.findFirst({
@@ -1129,49 +1173,29 @@ router.get('/tipos-servicos-compatibles/:alunoId', async (req, res) => {
       turma: confirmacao.tb_turmas.designacao
     });
 
-    // Construir filtros de busca
-    let whereConditions = {
-      status: "Activo",
-      AND: []
-    };
-
-    // Filtrar por categoria se fornecida (OBRIGATÓRIO - não incluir null)
-    if (categoria) {
-      whereConditions.categoria = parseInt(categoria);
-      console.log(`🏷️ Filtrando APENAS por categoria: ${categoria}`);
-    }
-
-    // Filtros de compatibilidade com classe e curso
-    whereConditions.AND.push({
-      OR: [
-        // Serviços gerais (sem classe/curso específico)
-        {
-          codigo_Classe: null,
-          codigo_Curso: null
-        },
-        // Serviços específicos para a classe do aluno
-        {
-          codigo_Classe: confirmacao.tb_turmas.tb_classes.codigo,
-          codigo_Curso: null
-        },
-        // Serviços específicos para o curso do aluno
-        {
-          codigo_Classe: null,
-          codigo_Curso: confirmacao.tb_turmas.tb_cursos.codigo
-        },
-        // Serviços específicos para classe E curso do aluno
-        {
-          codigo_Classe: confirmacao.tb_turmas.tb_classes.codigo,
-          codigo_Curso: confirmacao.tb_turmas.tb_cursos.codigo
-        }
-      ]
-    });
-
-    console.log('🔍 Condições de busca:', JSON.stringify(whereConditions, null, 2));
-
-    // Buscar tipos de serviços
-    const tiposServicos = await prisma.tb_tipo_servicos.findMany({
-      where: whereConditions,
+    // Buscar serviços específicos para classe/curso do aluno
+    const servicosEspecificos = await prisma.tb_tipo_servicos.findMany({
+      where: {
+        status: "Activo",
+        categoria: parseInt(categoria),
+        OR: [
+          // Serviços específicos para a classe do aluno
+          {
+            codigo_Classe: confirmacao.tb_turmas.tb_classes.codigo,
+            codigo_Curso: null
+          },
+          // Serviços específicos para o curso do aluno
+          {
+            codigo_Classe: null,
+            codigo_Curso: confirmacao.tb_turmas.tb_cursos.codigo
+          },
+          // Serviços específicos para classe E curso do aluno
+          {
+            codigo_Classe: confirmacao.tb_turmas.tb_classes.codigo,
+            codigo_Curso: confirmacao.tb_turmas.tb_cursos.codigo
+          }
+        ]
+      },
       orderBy: [
         // Priorizar serviços específicos para classe+curso
         { codigo_Classe: 'desc' },
@@ -1180,30 +1204,32 @@ router.get('/tipos-servicos-compatibles/:alunoId', async (req, res) => {
       ]
     });
 
-    console.log(`📋 Encontrados ${tiposServicos.length} tipos de serviços para categoria ${categoria}`);
+    console.log(`📋 Encontrados ${servicosEspecificos.length} serviços específicos para categoria ${categoria}`);
     
     // Se for categoria 1 (Propinas) e não encontrar nada, sugerir criar
-    if (categoria === '1' && tiposServicos.length === 0) {
+    if (categoria === '1' && servicosEspecificos.length === 0) {
       console.log('⚠️ Nenhuma propina encontrada para esta classe/curso');
     }
 
     res.json({
       success: true,
-      message: `Encontrados ${tiposServicos.length} tipos de serviços compatíveis`,
+      message: `Encontrados ${servicosEspecificos.length} tipos de serviços compatíveis`,
       data: {
-        tiposServicos: tiposServicos,
+        tiposServicos: servicosEspecificos,
         alunoInfo: {
           nome: confirmacao.tb_matriculas?.tb_alunos?.nome || 'Nome não encontrado',
           classe: confirmacao.tb_turmas.tb_classes.designacao,
           curso: confirmacao.tb_turmas.tb_cursos.designacao,
           turma: confirmacao.tb_turmas.designacao,
           codigoClasse: confirmacao.tb_turmas.tb_classes.codigo,
-          codigoCurso: confirmacao.tb_turmas.tb_cursos.codigo
+          codigoCurso: confirmacao.tb_turmas.tb_cursos.codigo,
+          tipo: 'especifico'
         },
         filtros: {
-          categoria: categoria ? parseInt(categoria) : null,
+          categoria: parseInt(categoria),
           codigoClasse: confirmacao.tb_turmas.tb_classes.codigo,
-          codigoCurso: confirmacao.tb_turmas.tb_cursos.codigo
+          codigoCurso: confirmacao.tb_turmas.tb_cursos.codigo,
+          tipo: 'especifico'
         }
       }
     });
