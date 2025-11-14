@@ -140,7 +140,7 @@ export class AcademicManagementService {
       const existingAno = await prisma.tb_ano_lectivo.findUnique({
         where: { codigo: parseInt(id) },
         include: {
-          tb_turmas: true
+          tb_confirmacoes: true
         }
       });
 
@@ -149,9 +149,9 @@ export class AcademicManagementService {
       }
 
       // TÉCNICA: VALIDAÇÃO COM DETALHES
-      if (existingAno.tb_turmas.length > 0) {
+      if (existingAno.tb_confirmacoes.length > 0) {
         throw new AppError(
-          `Não é possível excluir este ano letivo pois está sendo usado por ${existingAno.tb_turmas.length} turma(s)`, 
+          `Não é possível excluir este ano letivo pois está sendo usado por ${existingAno.tb_confirmacoes.length} confirmação(ões)`, 
           400
         );
       }

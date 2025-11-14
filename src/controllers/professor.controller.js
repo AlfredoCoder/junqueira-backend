@@ -172,6 +172,7 @@ export class ProfessorController {
         nome: t.tb_turmas.designacao,
         classe: t.tb_turmas.tb_classes.designacao,
         curso: t.tb_turmas.tb_cursos.designacao,
+        notaMaxima: t.tb_turmas.tb_classes.notaMaxima || 20, // Incluir nota máxima da classe
         disciplina: {
           codigo: t.tb_disciplinas.codigo,
           nome: t.tb_disciplinas.designacao
